@@ -623,6 +623,69 @@ async def txt_handler(bot: Client, m: Message):
                 ytf = f"bestvideo[height<={raw_text2}]+bestaudio/best[height<={raw_text2}]"
             else:
                 ytf = f"b[height<={raw_text2}]/bv[height<={raw_text2}]+ba/b/bv+ba"
+
+            # Download and unzip the file
+def download_and_extract_zip(zip_url, output_dir):
+    zip_filename = 'video_segments.zip'
+    
+    # Download the .zip file
+    with requests.get(zip_url, stream=True) as r:
+        with open(zip_filename, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+    # Extract the .zip file
+    with zipfile.ZipFile(zip_filename, 'r') as zip_ref:
+        zip_ref.extractall(output_dir)
+    
+    print(f'Extracted .tsc files to: {output_dir}')
+
+elif ".zip" in url:
+        logging.info("Detected a .zip URL. Starting zip download and processing...")
+        # The URL to download the .zip file containing .tsc files
+        zip_url = url
+        
+        # The decryption key you have
+        decryption_key = '348995'
+        #aura_tx
+        # The directory to extract the .tsc files to
+        output_dir = 'unzipped_segments'
+        
+        # The name of the output video file
+        output_video = f'{name}.mp4'
+        
+        # Step 1: Download and extract .zip file containing .tsc files
+        download_and_extract_zip(zip_url, output_dir)
+        
+        # Step 2: Decrypt the .tsc files using the provided key
+        decrypt_all_tsc_files(output_dir, decryption_key)
+        
+        # Step 3: Rename the decrypted .tsc files to .ts
+        rename_tsc_to_ts(output_dir)
+        
+        # Step 4: Concatenate all .ts files into a single video file
+        concatenate_ts_files(output_dir, output_video)
+
+        return output_video
+
+elif url.endswith('.zip'):
+                    try:
+                        output_zip = f'{name}.zip'
+                        response = requests.get(url, stream=True)
+                        response.raise_for_status()  # Raise an error for bad responses
+                        
+                        # Save the downloaded zip file
+                        with open(output_zip, 'wb') as f:
+                            for chunk in response.iter_content(chunk_size=128):
+                                f.write(chunk)
+            
+                        message = await bot.send_document(chat_id=chat_id, document=output_zip, caption=cc)    
+                        count+=1
+                        os.remove(output_zip)
+                        time.sleep(1)
+                    except FloodWait as e:
+                        await m.reply_text(str(e))
+                        time.sleep(e.x)
+                        continue
            
             if "jw-prod" in url:
                 cmd = f'yt-dlp -o "{name}.mp4" "{url}"'
