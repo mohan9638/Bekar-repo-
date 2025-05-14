@@ -610,8 +610,6 @@ async def txt_handler(bot: Client, m: Message):
 
             if ".pdf*" in url:
                 url = f"https://dragoapi.vercel.app/pdf/{url}"
-            if ".zip" in url:
-                url = f"https://video.pablocoder.eu.org/appx-zip?url={url}"
                 
             elif 'encrypted.m' in url:
                 appxkey = url.split('*')[1]
